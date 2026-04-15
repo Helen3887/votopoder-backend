@@ -1,14 +1,17 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto'; // Verifica que la ruta sea correcta
+import { LoginDto } from './dto/login.dto';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Login para SuperAdmin y Administradores de Campaña' })
   async login(@Body() loginDto: LoginDto) {
-    // El error ocurría aquí porque loginDto llegaba undefined
-    return this.authService.login(loginDto.usuario, loginDto.clave);
+    return this.authService.login(loginDto);
   }
 }

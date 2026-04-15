@@ -1,0 +1,32 @@
+[
+  {
+    "id": 5,
+    "departamento": "Antioquia",
+    "ciudades": ["Medellín", "Barbosa", "Bello", "Itagüí", "Envigado", "Apartadó", "Rionegro", "Turbo", "Caucasia"]
+  },
+  {
+    "id": 11,
+    "departamento": "Bogotá, D.C.",
+    "ciudades": ["Bogotá, D.C."]
+  },
+  {
+    "id": 76,
+    "departamento": "Valle del Cauca",
+    "ciudades": ["Cali", "Buenaventura", "Palmira", "Tuluá", "Yumbo", "Cartago", "Buga"]
+  },
+  {
+    "id": 8,
+    "departamento": "Atlántico",
+    "ciudades": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga"]
+  },
+  {
+    "id": 13,
+    "departamento": "Bolívar",
+    "ciudades": ["Cartagena de Indias", "Magangué", "Turbaco"]
+  },
+  {
+    "id": 68,
+    "departamento": "Santander",
+    "ciudades": ["Bucaramanga", "Floridablanca", "Barrancabermeja", "Girón"]
+  }
+]

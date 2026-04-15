@@ -29,7 +29,10 @@ export class CampaignService {
     return await this.campaignRepo.save(newCampaign);
   }
 
-  async findAll() {
-    return await this.campaignRepo.find({ order: { createdAt: 'DESC' } });
-  }
+  a// Busca el método findAll y cámbialo a esto:
+async findAll() {
+  return await this.campaignRepo.find({ 
+    order: { nombre: 'ASC' } // Cambiamos createdAt por nombre
+  });
+}
 }

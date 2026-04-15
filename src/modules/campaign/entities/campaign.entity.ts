@@ -1,5 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn } from 'typeorm';
-import { Voter } from '../../voter/entities/voter.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity('campaigns')
 export class Campaign {
@@ -9,20 +8,8 @@ export class Campaign {
   @Column()
   nombre: string;
 
-  @Column({ nullable: true })
-  descripcion: string;
-
-  @Column()
-  partido: string;
-
-  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
-  presupuesto: number;
-
   @Column()
   candidato: string;
-
-  @Column()
-  municipio: string;
 
   @Column()
   adminUsuario: string;
@@ -30,13 +17,7 @@ export class Campaign {
   @Column()
   adminClave: string;
 
-  @Column({ default: true })
-  isActive: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  // Relación: Una campaña tiene muchos votantes
-  @OneToMany(() => Voter, (voter) => voter.campaign)
-  voters: Voter[];
+  // Cambiamos la relación para que no dependa de la importación directa
+  @OneToMany('Voter', 'campaign') 
+  voters: any[];
 }

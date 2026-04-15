@@ -1,57 +1,26 @@
-import { Injectable, UnauthorizedException, OnModuleInit } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '../user/entities/user.entity';
-import * as bcrypt from 'bcrypt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
-export class AuthService implements OnModuleInit {
-  constructor(
-    @InjectRepository(User)
-    private userRepo: Repository<User>,
-    private jwtService: JwtService,
-  ) {}
+export class AuthService {
+  constructor(private readonly jwtService: JwtService) {}
 
-  async onModuleInit() {
-    // Agregamos un pequeño retraso de 2 segundos para dar tiempo a que TypeORM cree la tabla
-    await new Promise(resolve => setTimeout(resolve, 2000));
+  async login(loginDto: any) {
+    const { usuario, clave } = loginDto;
 
-    try {
-      const adminExists = await this.userRepo.findOne({ 
-        where: { usuario: 'superadmin' } 
-      });
-      
-      if (!adminExists) {
-        const hashedClave = await bcrypt.hash('votopoder2027', 10);
-        
-        const superAdmin = this.userRepo.create({
-          nombreCompleto: 'Administrador Global',
-          usuario: 'superadmin',
-          clave: hashedClave,
-          rol: 'superadmin',
-          email: 'admin@votopoder.com'
-        });
-
-        await this.userRepo.save(superAdmin);
-        console.log('👤 Usuario SuperAdmin creado: superadmin / votopoder2027');
-      }
-    } catch (error) {
-      console.error('⏳ Esperando a que la base de datos se sincronice...');
+    // Validación para el SuperAdmin (basado en tu VotoPoder v5.5)
+    if (usuario === 'superadmin' && clave === 'votopoder2027') {
+      const payload = { username: usuario, role: 'superadmin' };
+      return {
+        access_token: this.jwtService.sign(payload),
+        user: {
+          nombre: 'Sello Legal Admin',
+          rol: 'superadmin'
+        }
+      };
     }
-  }
 
-  async login(usuario: string, clave: string) {
-    const user = await this.userRepo.findOne({ where: { usuario } });
-    if (!user) throw new UnauthorizedException('Usuario no existe');
-
-    const isMatch = await bcrypt.compare(clave, user.clave);
-    if (!isMatch) throw new UnauthorizedException('Clave incorrecta');
-
-    const payload = { sub: user.id, rol: user.rol, nombre: user.nombreCompleto };
-    return {
-      access_token: this.jwtService.sign(payload),
-      user: payload,
-    };
+    // Aquí luego agregaremos la lógica para buscar administradores de campaña en la DB
+    throw new UnauthorizedException('Credenciales incorrectas');
   }
 }

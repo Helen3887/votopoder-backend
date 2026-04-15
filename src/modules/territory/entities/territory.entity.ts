@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Voter } from '../../voter/entities/voter.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { TerritoryDetail } from './territory-detail.entity';
 
 @Entity('territories')
 export class Territory {
@@ -9,9 +9,16 @@ export class Territory {
   @Column()
   nombre: string;
 
-  @Column({ default: 'Barrio' }) // Puede ser 'Barrio' o 'Vereda'
-  tipo: string;
+  @Column()
+  nivel: string; // 'departamento' o 'municipio'
 
-  @OneToMany(() => Voter, (voter) => voter.barrioVereda)
-  voters: Voter[];
+  // --- ESTA ES LA LÍNEA QUE FALTA ---
+  @OneToOne(() => TerritoryDetail, (detail) => detail.territory)
+  detalle: TerritoryDetail;
+
+  @ManyToOne(() => Territory, (territory) => territory.hijos, { nullable: true })
+  padre: Territory;
+
+  @OneToMany(() => Territory, (territory) => territory.padre)
+  hijos: Territory[];
 }
