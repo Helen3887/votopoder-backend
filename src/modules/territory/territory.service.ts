@@ -11,28 +11,53 @@ export class TerritoryService {
   ) {}
 
   async seed() {
-    // 1. Datos iniciales de ejemplo (puedes expandir esta lista)
-    const data = [
-      { nombre: 'Antioquia', nivel: 'departamento' },
-      { nombre: 'Barbosa', nivel: 'municipio' },
-      { nombre: 'Medellín', nivel: 'municipio' },
-      { nombre: 'Bogotá', nivel: 'departamento' },
-    ];
-
-    // 2. Insertar solo si la tabla está vacía para evitar duplicados
     const count = await this.territoryRepository.count();
     if (count > 0) return { message: 'La base de datos ya tiene datos.' };
 
-    await this.territoryRepository.save(data);
-    return { message: 'Territorios cargados con éxito', total: data.length };
+    // 1. Creamos los departamentos (Padres)
+    const antioquia = await this.territoryRepository.save({ 
+      nombre: 'Antioquia', 
+      nivel: 'departamento' 
+    });
+
+    const bogota = await this.territoryRepository.save({ 
+      nombre: 'Bogotá', 
+      nivel: 'departamento' 
+    });
+
+    // 2. Creamos los municipios asociándolos a sus padres
+    const municipios = [
+      { nombre: 'Barbosa', nivel: 'municipio', parent: antioquia },
+      { nombre: 'Medellín', nivel: 'municipio', parent: antioquia },
+      { nombre: 'Bello', nivel: 'municipio', parent: antioquia },
+      { nombre: 'Bosa', nivel: 'municipio', parent: bogota },
+      { nombre: 'Chapinero', nivel: 'municipio', parent: bogota },
+    ];
+
+    await this.territoryRepository.save(municipios);
+    return { message: 'Relaciones territoriales cargadas con éxito' };
   }
 
   async findAll() {
-    return await this.territoryRepository.find();
+    return await this.territoryRepository.find({ relations: ['parent'] });
+  }
+
+  async findMunicipiosByDepartamento(nombreDepto: string) {
+    // Buscamos el departamento primero
+    const depto = await this.territoryRepository.findOne({
+      where: { nombre: nombreDepto, nivel: 'departamento' }
+    });
+
+    if (!depto) return [];
+
+    // Buscamos hijos cuyo parent sea el depto encontrado
+    return await this.territoryRepository.find({
+      where: { parent: { id: depto.id } },
+      order: { nombre: 'ASC' }
+    });
   }
 
   async findDetailsByName(nombre: string) {
-    // Lógica para buscar detalles específicos
-    return { nombre, info: 'Datos del DANE próximamente' };
+    return await this.territoryRepository.findOne({ where: { nombre } });
   }
 }

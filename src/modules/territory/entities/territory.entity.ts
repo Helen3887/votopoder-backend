@@ -1,7 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { TerritoryDetail } from './territory-detail.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { TerritoryDetail } from './territory-detail.entity'; // Asegúrate de que el nombre del archivo sea correcto
 
-@Entity('territories')
+@Entity('territories new')
 export class Territory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -12,13 +12,16 @@ export class Territory {
   @Column()
   nivel: string; // 'departamento' o 'municipio'
 
-  // --- ESTA ES LA LÍNEA QUE FALTA ---
+  // 👇 AGREGA ESTA RELACIÓN (El "enchufe" que faltaba)
   @OneToOne(() => TerritoryDetail, (detail) => detail.territory)
   detalle: TerritoryDetail;
 
-  @ManyToOne(() => Territory, (territory) => territory.hijos, { nullable: true })
-  padre: Territory;
+  @ManyToOne(() => Territory, (territory) => territory.children, { nullable: true })
+  parent: Territory;
 
-  @OneToMany(() => Territory, (territory) => territory.padre)
-  hijos: Territory[];
+  @OneToMany(() => Territory, (territory) => territory.parent)
+  children: Territory[];
+
+  @Column({ type: 'json', nullable: true })
+  metadata: any;
 }

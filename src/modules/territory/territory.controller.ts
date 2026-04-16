@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Query } from '@nestjs/common'; // Agregamos Post
+import { Controller, Get, Post, Param, Query } from '@nestjs/common';
 import { TerritoryService } from './territory.service';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
@@ -7,22 +7,26 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 export class TerritoryController {
   constructor(private readonly territoryService: TerritoryService) {}
 
-  // 👇 ESTE ES EL BLOQUE QUE NECESITAS AGREGAR
   @Post('seed')
-  @ApiOperation({ summary: 'Cargar departamentos y municipios iniciales en la DB' })
+  @ApiOperation({ summary: 'Cargar departamentos y municipios con jerarquía' })
   async seed() {
     return await this.territoryService.seed();
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar todos los territorios (filtrable por nivel)' })
-  findAll(@Query('nivel') nivel?: string) {
-    // Nota: Aquí podrías pasar el 'nivel' al service si quieres filtrar
+  @ApiOperation({ summary: 'Listar todos los territorios' })
+  findAll() {
     return this.territoryService.findAll(); 
   }
 
+  @Get('municipios/:departamentoNombre')
+  @ApiOperation({ summary: 'Listar municipios de un departamento' })
+  async getMunicipiosByDepto(@Param('departamentoNombre') nombre: string) {
+    return await this.territoryService.findMunicipiosByDepartamento(nombre);
+  }
+
   @Get('details/:municipioNombre')
-  @ApiOperation({ summary: 'Obtener estadísticas DANE/CNE de un municipio' })
+  @ApiOperation({ summary: 'Obtener ficha técnica de un municipio' })
   async getDetails(@Param('municipioNombre') nombre: string) {
     return await this.territoryService.findDetailsByName(nombre);
   }
